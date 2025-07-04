@@ -1,78 +1,810 @@
-\documentclass{article}
-\usepackage{fontspec}
+\documentclass[11pt]{article}
+
+    \usepackage[breakable]{tcolorbox}
+    \usepackage{parskip} % Stop auto-indenting (to mimic markdown behaviour)
+    
+
+    % Basic figure setup, for now with no caption control since it's done
+    % automatically by Pandoc (which extracts ![](path) syntax from Markdown).
+    \usepackage{graphicx}
+    % Keep aspect ratio if custom image width or height is specified
+    \setkeys{Gin}{keepaspectratio}
+    % Maintain compatibility with old templates. Remove in nbconvert 6.0
+    \let\Oldincludegraphics\includegraphics
+    % Ensure that by default, figures have no caption (until we provide a
+    % proper Figure object with a Caption API and a way to capture that
+    % in the conversion process - todo).
+    \usepackage{caption}
+    \DeclareCaptionFormat{nocaption}{}
+    \captionsetup{format=nocaption,aboveskip=0pt,belowskip=0pt}
+
+    \usepackage{float}
+    \floatplacement{figure}{H} % forces figures to be placed at the correct location
+    \usepackage{xcolor} % Allow colors to be defined
+    \usepackage{enumerate} % Needed for markdown enumerations to work
+    \usepackage{geometry} % Used to adjust the document margins
+    \usepackage{amsmath} % Equations
+    \usepackage{amssymb} % Equations
+    \usepackage{textcomp} % defines textquotesingle
+    % Hack from http://tex.stackexchange.com/a/47451/13684:
+    \AtBeginDocument{%
+        \def\PYZsq{\textquotesingle}% Upright quotes in Pygmentized code
+    }
+    \usepackage{upquote} % Upright quotes for verbatim code
+    \usepackage{eurosym} % defines \euro
+
+    \usepackage{iftex}
+    \ifPDFTeX
+        \usepackage[T1]{fontenc}
+        \IfFileExists{alphabeta.sty}{
+              \usepackage{alphabeta}
+          }{
+              \usepackage[mathletters]{ucs}
+              \usepackage[utf8x]{inputenc}
+          }
+    \else
+        \usepackage{fontspec}
+        \usepackage{unicode-math}
+    \fi
+
+    \usepackage{fancyvrb} % verbatim replacement that allows latex
+    \usepackage{grffile} % extends the file name processing of package graphics
+                         % to support a larger range
+    \makeatletter % fix for old versions of grffile with XeLaTeX
+    \@ifpackagelater{grffile}{2019/11/01}
+    {
+      % Do nothing on new versions
+    }
+    {
+      \def\Gread@@xetex#1{%
+        \IfFileExists{"\Gin@base".bb}%
+        {\Gread@eps{\Gin@base.bb}}%
+        {\Gread@@xetex@aux#1}%
+      }
+    }
+    \makeatother
+    \usepackage[Export]{adjustbox} % Used to constrain images to a maximum size
+    \adjustboxset{max size={0.9\linewidth}{0.9\paperheight}}
+
+    % The hyperref package gives us a pdf with properly built
+    % internal navigation ('pdf bookmarks' for the table of contents,
+    % internal cross-reference links, web links for URLs, etc.)
+    \usepackage{hyperref}
+    % The default LaTeX title has an obnoxious amount of whitespace. By default,
+    % titling removes some of it. It also provides customization options.
+    \usepackage{titling}
+    \usepackage{longtable} % longtable support required by pandoc >1.10
+    \usepackage{booktabs}  % table support for pandoc > 1.12.2
+    \usepackage{array}     % table support for pandoc >= 2.11.3
+    \usepackage{calc}      % table minipage width calculation for pandoc >= 2.11.1
+    \usepackage[inline]{enumitem} % IRkernel/repr support (it uses the enumerate* environment)
+    \usepackage[normalem]{ulem} % ulem is needed to support strikethroughs (\sout)
+                                % normalem makes italics be italics, not underlines
+    \usepackage{soul}      % strikethrough (\st) support for pandoc >= 3.0.0
+    \usepackage{mathrsfs}
+    
+
+    
+    % Colors for the hyperref package
+    \definecolor{urlcolor}{rgb}{0,.145,.698}
+    \definecolor{linkcolor}{rgb}{.71,0.21,0.01}
+    \definecolor{citecolor}{rgb}{.12,.54,.11}
+
+    % ANSI colors
+    \definecolor{ansi-black}{HTML}{3E424D}
+    \definecolor{ansi-black-intense}{HTML}{282C36}
+    \definecolor{ansi-red}{HTML}{E75C58}
+    \definecolor{ansi-red-intense}{HTML}{B22B31}
+    \definecolor{ansi-green}{HTML}{00A250}
+    \definecolor{ansi-green-intense}{HTML}{007427}
+    \definecolor{ansi-yellow}{HTML}{DDB62B}
+    \definecolor{ansi-yellow-intense}{HTML}{B27D12}
+    \definecolor{ansi-blue}{HTML}{208FFB}
+    \definecolor{ansi-blue-intense}{HTML}{0065CA}
+    \definecolor{ansi-magenta}{HTML}{D160C4}
+    \definecolor{ansi-magenta-intense}{HTML}{A03196}
+    \definecolor{ansi-cyan}{HTML}{60C6C8}
+    \definecolor{ansi-cyan-intense}{HTML}{258F8F}
+    \definecolor{ansi-white}{HTML}{C5C1B4}
+    \definecolor{ansi-white-intense}{HTML}{A1A6B2}
+    \definecolor{ansi-default-inverse-fg}{HTML}{FFFFFF}
+    \definecolor{ansi-default-inverse-bg}{HTML}{000000}
+
+    % common color for the border for error outputs.
+    \definecolor{outerrorbackground}{HTML}{FFDFDF}
+
+    % commands and environments needed by pandoc snippets
+    % extracted from the output of `pandoc -s`
+    \providecommand{\tightlist}{%
+      \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+    \DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+    % Add ',fontsize=\small' for more characters per line
+    \newenvironment{Shaded}{}{}
+    \newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
+    \newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{{#1}}}
+    \newcommand{\DecValTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\FloatTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\CharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\StringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{{#1}}}}
+    \newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{{#1}}}
+    \newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.02,0.16,0.49}{{#1}}}
+    \newcommand{\RegionMarkerTok}[1]{{#1}}
+    \newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\NormalTok}[1]{{#1}}
+
+    % Additional commands for more recent versions of Pandoc
+    \newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.53,0.00,0.00}{{#1}}}
+    \newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.73,0.40,0.53}{{#1}}}
+    \newcommand{\ImportTok}[1]{{#1}}
+    \newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.73,0.13,0.13}{\textit{{#1}}}}
+    \newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\VariableTok}[1]{\textcolor[rgb]{0.10,0.09,0.49}{{#1}}}
+    \newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
+    \newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.40,0.40,0.40}{{#1}}}
+    \newcommand{\BuiltInTok}[1]{{#1}}
+    \newcommand{\ExtensionTok}[1]{{#1}}
+    \newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.74,0.48,0.00}{{#1}}}
+    \newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.49,0.56,0.16}{{#1}}}
+    \newcommand{\InformationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+
+
+    % Define a nice break command that doesn't care if a line doesn't already
+    % exist.
+    \def\br{\hspace*{\fill} \\* }
+    % Math Jax compatibility definitions
+    \def\gt{>}
+    \def\lt{<}
+    \let\Oldtex\TeX
+    \let\Oldlatex\LaTeX
+    \renewcommand{\TeX}{\textrm{\Oldtex}}
+    \renewcommand{\LaTeX}{\textrm{\Oldlatex}}
+    % Document parameters
+    % Document title
+    \title{lista3}
+    
+    
+    
+    
+    
+    
+    
+% Pygments definitions
+\makeatletter
+\def\PY@reset{\let\PY@it=\relax \let\PY@bf=\relax%
+    \let\PY@ul=\relax \let\PY@tc=\relax%
+    \let\PY@bc=\relax \let\PY@ff=\relax}
+\def\PY@tok#1{\csname PY@tok@#1\endcsname}
+\def\PY@toks#1+{\ifx\relax#1\empty\else%
+    \PY@tok{#1}\expandafter\PY@toks\fi}
+\def\PY@do#1{\PY@bc{\PY@tc{\PY@ul{%
+    \PY@it{\PY@bf{\PY@ff{#1}}}}}}}
+\def\PY#1#2{\PY@reset\PY@toks#1+\relax+\PY@do{#2}}
+
+\@namedef{PY@tok@w}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.73,0.73}{##1}}}
+\@namedef{PY@tok@c}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cp}{\def\PY@tc##1{\textcolor[rgb]{0.61,0.40,0.00}{##1}}}
+\@namedef{PY@tok@k}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kp}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kt}{\def\PY@tc##1{\textcolor[rgb]{0.69,0.00,0.25}{##1}}}
+\@namedef{PY@tok@o}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@ow}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\@namedef{PY@tok@nb}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@nf}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@nc}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@nn}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@ne}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.80,0.25,0.22}{##1}}}
+\@namedef{PY@tok@nv}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@no}{\def\PY@tc##1{\textcolor[rgb]{0.53,0.00,0.00}{##1}}}
+\@namedef{PY@tok@nl}{\def\PY@tc##1{\textcolor[rgb]{0.46,0.46,0.00}{##1}}}
+\@namedef{PY@tok@ni}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.44,0.44,0.44}{##1}}}
+\@namedef{PY@tok@na}{\def\PY@tc##1{\textcolor[rgb]{0.41,0.47,0.13}{##1}}}
+\@namedef{PY@tok@nt}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@nd}{\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\@namedef{PY@tok@s}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sd}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@si}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.64,0.35,0.47}{##1}}}
+\@namedef{PY@tok@se}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.67,0.36,0.12}{##1}}}
+\@namedef{PY@tok@sr}{\def\PY@tc##1{\textcolor[rgb]{0.64,0.35,0.47}{##1}}}
+\@namedef{PY@tok@ss}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@sx}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@m}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@gh}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\@namedef{PY@tok@gu}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.50,0.00,0.50}{##1}}}
+\@namedef{PY@tok@gd}{\def\PY@tc##1{\textcolor[rgb]{0.63,0.00,0.00}{##1}}}
+\@namedef{PY@tok@gi}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.52,0.00}{##1}}}
+\@namedef{PY@tok@gr}{\def\PY@tc##1{\textcolor[rgb]{0.89,0.00,0.00}{##1}}}
+\@namedef{PY@tok@ge}{\let\PY@it=\textit}
+\@namedef{PY@tok@gs}{\let\PY@bf=\textbf}
+\@namedef{PY@tok@gp}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\@namedef{PY@tok@go}{\def\PY@tc##1{\textcolor[rgb]{0.44,0.44,0.44}{##1}}}
+\@namedef{PY@tok@gt}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.27,0.87}{##1}}}
+\@namedef{PY@tok@err}{\def\PY@bc##1{{\setlength{\fboxsep}{\string -\fboxrule}\fcolorbox[rgb]{1.00,0.00,0.00}{1,1,1}{\strut ##1}}}}
+\@namedef{PY@tok@kc}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kd}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kn}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kr}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@bp}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@fm}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@vc}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@vg}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@vi}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@vm}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@sa}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sb}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sc}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@dl}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@s2}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sh}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@s1}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@mb}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mf}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mh}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mi}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@il}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mo}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@ch}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cm}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cpf}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@c1}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cs}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+
+\def\PYZbs{\char`\\}
+\def\PYZus{\char`\_}
+\def\PYZob{\char`\{}
+\def\PYZcb{\char`\}}
+\def\PYZca{\char`\^}
+\def\PYZam{\char`\&}
+\def\PYZlt{\char`\<}
+\def\PYZgt{\char`\>}
+\def\PYZsh{\char`\#}
+\def\PYZpc{\char`\%}
+\def\PYZdl{\char`\$}
+\def\PYZhy{\char`\-}
+\def\PYZsq{\char`\'}
+\def\PYZdq{\char`\"}
+\def\PYZti{\char`\~}
+% for compatibility with earlier versions
+\def\PYZat{@}
+\def\PYZlb{[}
+\def\PYZrb{]}
+\makeatother
+
+
+    % For linebreaks inside Verbatim environment from package fancyvrb.
+    \makeatletter
+        \newbox\Wrappedcontinuationbox
+        \newbox\Wrappedvisiblespacebox
+        \newcommand*\Wrappedvisiblespace {\textcolor{red}{\textvisiblespace}}
+        \newcommand*\Wrappedcontinuationsymbol {\textcolor{red}{\llap{\tiny$\m@th\hookrightarrow$}}}
+        \newcommand*\Wrappedcontinuationindent {3ex }
+        \newcommand*\Wrappedafterbreak {\kern\Wrappedcontinuationindent\copy\Wrappedcontinuationbox}
+        % Take advantage of the already applied Pygments mark-up to insert
+        % potential linebreaks for TeX processing.
+        %        {, <, #, %, $, ' and ": go to next line.
+        %        _, }, ^, &, >, - and ~: stay at end of broken line.
+        % Use of \textquotesingle for straight quote.
+        \newcommand*\Wrappedbreaksatspecials {%
+            \def\PYGZus{\discretionary{\char`\_}{\Wrappedafterbreak}{\char`\_}}%
+            \def\PYGZob{\discretionary{}{\Wrappedafterbreak\char`\{}{\char`\{}}%
+            \def\PYGZcb{\discretionary{\char`\}}{\Wrappedafterbreak}{\char`\}}}%
+            \def\PYGZca{\discretionary{\char`\^}{\Wrappedafterbreak}{\char`\^}}%
+            \def\PYGZam{\discretionary{\char`\&}{\Wrappedafterbreak}{\char`\&}}%
+            \def\PYGZlt{\discretionary{}{\Wrappedafterbreak\char`\<}{\char`\<}}%
+            \def\PYGZgt{\discretionary{\char`\>}{\Wrappedafterbreak}{\char`\>}}%
+            \def\PYGZsh{\discretionary{}{\Wrappedafterbreak\char`\#}{\char`\#}}%
+            \def\PYGZpc{\discretionary{}{\Wrappedafterbreak\char`\%}{\char`\%}}%
+            \def\PYGZdl{\discretionary{}{\Wrappedafterbreak\char`\$}{\char`\$}}%
+            \def\PYGZhy{\discretionary{\char`\-}{\Wrappedafterbreak}{\char`\-}}%
+            \def\PYGZsq{\discretionary{}{\Wrappedafterbreak\textquotesingle}{\textquotesingle}}%
+            \def\PYGZdq{\discretionary{}{\Wrappedafterbreak\char`\"}{\char`\"}}%
+            \def\PYGZti{\discretionary{\char`\~}{\Wrappedafterbreak}{\char`\~}}%
+        }
+        % Some characters . , ; ? ! / are not pygmentized.
+        % This macro makes them "active" and they will insert potential linebreaks
+        \newcommand*\Wrappedbreaksatpunct {%
+            \lccode`\~`\.\lowercase{\def~}{\discretionary{\hbox{\char`\.}}{\Wrappedafterbreak}{\hbox{\char`\.}}}%
+            \lccode`\~`\,\lowercase{\def~}{\discretionary{\hbox{\char`\,}}{\Wrappedafterbreak}{\hbox{\char`\,}}}%
+            \lccode`\~`\;\lowercase{\def~}{\discretionary{\hbox{\char`\;}}{\Wrappedafterbreak}{\hbox{\char`\;}}}%
+            \lccode`\~`\:\lowercase{\def~}{\discretionary{\hbox{\char`\:}}{\Wrappedafterbreak}{\hbox{\char`\:}}}%
+            \lccode`\~`\?\lowercase{\def~}{\discretionary{\hbox{\char`\?}}{\Wrappedafterbreak}{\hbox{\char`\?}}}%
+            \lccode`\~`\!\lowercase{\def~}{\discretionary{\hbox{\char`\!}}{\Wrappedafterbreak}{\hbox{\char`\!}}}%
+            \lccode`\~`\/\lowercase{\def~}{\discretionary{\hbox{\char`\/}}{\Wrappedafterbreak}{\hbox{\char`\/}}}%
+            \catcode`\.\active
+            \catcode`\,\active
+            \catcode`\;\active
+            \catcode`\:\active
+            \catcode`\?\active
+            \catcode`\!\active
+            \catcode`\/\active
+            \lccode`\~`\~
+        }
+    \makeatother
+
+    \let\OriginalVerbatim=\Verbatim
+    \makeatletter
+    \renewcommand{\Verbatim}[1][1]{%
+        %\parskip\z@skip
+        \sbox\Wrappedcontinuationbox {\Wrappedcontinuationsymbol}%
+        \sbox\Wrappedvisiblespacebox {\FV@SetupFont\Wrappedvisiblespace}%
+        \def\FancyVerbFormatLine ##1{\hsize\linewidth
+            \vtop{\raggedright\hyphenpenalty\z@\exhyphenpenalty\z@
+                \doublehyphendemerits\z@\finalhyphendemerits\z@
+                \strut ##1\strut}%
+        }%
+        % If the linebreak is at a space, the latter will be displayed as visible
+        % space at end of first line, and a continuation symbol starts next line.
+        % Stretch/shrink are however usually zero for typewriter font.
+        \def\FV@Space {%
+            \nobreak\hskip\z@ plus\fontdimen3\font minus\fontdimen4\font
+            \discretionary{\copy\Wrappedvisiblespacebox}{\Wrappedafterbreak}
+            {\kern\fontdimen2\font}%
+        }%
+
+        % Allow breaks at special characters using \PYG... macros.
+        \Wrappedbreaksatspecials
+        % Breaks at punctuation characters . , ; ? ! and / need catcode=\active
+        \OriginalVerbatim[#1,codes*=\Wrappedbreaksatpunct]%
+    }
+    \makeatother
+
+    % Exact colors from NB
+    \definecolor{incolor}{HTML}{303F9F}
+    \definecolor{outcolor}{HTML}{D84315}
+    \definecolor{cellborder}{HTML}{CFCFCF}
+    \definecolor{cellbackground}{HTML}{F7F7F7}
+
+    % prompt
+    \makeatletter
+    \newcommand{\boxspacing}{\kern\kvtcb@left@rule\kern\kvtcb@boxsep}
+    \makeatother
+    \newcommand{\prompt}[4]{
+        {\ttfamily\llap{{\color{#2}[#3]:\hspace{3pt}#4}}\vspace{-\baselineskip}}
+    }
+    
+
+    
+    % Prevent overflowing lines due to hard-to-break entities
+    \sloppy
+    % Setup hyperref package
+    \hypersetup{
+      breaklinks=true,  % so long urls are correctly broken across lines
+      colorlinks=true,
+      urlcolor=urlcolor,
+      linkcolor=linkcolor,
+      citecolor=citecolor,
+      }
+    % Slightly bigger margins than the latex defaults
+    
+    \geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+    
+    
+
 \begin{document}
+    
+    \maketitle
+    
+    
 
-Estimativa de Função de Produção
+    
+    \begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Estime os parâmetros \(\beta_k\), \(\beta_l\) por GMM utilizando o
+  estimador apresentado acima. Escreva um programa em Matlab utilizando
+  o solver fminsearch.
+\end{enumerate}
 
-Seja a função de produção Cobb-Douglas (log-linear):
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{1}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{import} \PY{n+nn}{pandas} \PY{k}{as} \PY{n+nn}{pd}
 
-$y_{jt} = \beta_k k_{jt} + \beta_l l_{jt} + \omega_{jt}$ (1)
+\PY{n}{chilean} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{read\PYZus{}csv}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{chilean.csv}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
 
-tal que $x = ln(X)$, X é uma variável aleatória, y é o ln do produto (medido como valor adicionado) da firma j no período t, k é o ln do estoque de capital e $\omega$ a produtividade total dos fatores (PTF).
-O problema básico da estimação dos parâmetros da função de produção diz que as variáveis k e l podem ser correlacionadas com o termo de erro, se estimada por OLS. Além de que k e l podem ser escolhidos juntamente com y.
-Neste problema, a função de produção (1) deve ser estimada usando o método de dois estágios de Ackerberg, Caves e Fraser (2015). O método é baseado em modelo estrutural de Olley e Pakes (1996) e discussões/avanços longos de Levinsohn e Petrin (2003) e Wooldridge (2009). O método é resumidamente apresentado abaixo – abstraindo da discussão teórica e da estratégia de identificação.
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{2}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{import} \PY{n+nn}{numpy} \PY{k}{as} \PY{n+nn}{np}
+\PY{k+kn}{import} \PY{n+nn}{pandas} \PY{k}{as} \PY{n+nn}{pd}
+\PY{k+kn}{import} \PY{n+nn}{statsmodels}\PY{n+nn}{.}\PY{n+nn}{api} \PY{k}{as} \PY{n+nn}{sm}
+\PY{k+kn}{from} \PY{n+nn}{scipy}\PY{n+nn}{.}\PY{n+nn}{optimize} \PY{k+kn}{import} \PY{n}{minimize}
 
-A estratégia de estimação é baseada em dois estágios. No primeiro estágio é computado um modelo semiparamétrico para identificar um termo de erro que ajuda na correta identificação dos parâmetros $\beta_k$ e $\beta_l$ em (1). No segundo estágio os parâmetros $\beta_k$ e $\beta_l$ são estimados por GMM.
-No primeiro estágio estime por OLS o seguinte modelo:
-
-$y_{jt} = \beta_0 + \beta_k k_{jt} + \beta_l l_{jt} + f^{−1}_t (k_{jt}, l_{jt},m_{jt}) + \varepsilon_{jt}$ (2)
-$y_{jt} = \Phi_t(k_{jt}, l_{jt},m_{jt}) + \varepsilon_{jt}$
-
-tal que $\omega_{jt} \equiv f^{−1}_t (k_{jt}, l_{jt},m_{jt})$, tal que m são os insumos intermediários. O termo $f^{−1}_t (k_{jt}, l_{jt},m_{jt})$ é um polinômio de quarta ordem. O polinômio é o seguinte:
-
-$f^{−1}_t (k_{jt}, l_{jt},m_{jt}) = \sum_{i=0}^4 \beta_{k,l,i,4−i}k^i_{jt} l^{4−i}_{jt} + \sum_{i=0}^4 \beta_{k,m,i,4−i}k^i_{jt} m^{4−i}_{jt} + \sum_{i=0}^4 \beta_{m,l,i,4−i}m^i_{jt} l^{4−i}_{jt} $ (3)
-
-Após estimar (2) calcule e salve o valor predito de $\Phi_t(·)$:
-
-$ \hat{\Phi_t}(k_{jt}, l_{jt},m_{jt}) $(4)
-
-Assumindo que a produtividade tem dinâmica AR(1), $\omega_{jt} = \rho \omega_{jt−1} + \xi_{jt}$, o
-segundo estágio é formado pelos momentos
-$E[(\xi_{jt} + \varepsilon_{jt}).Z_{jt}] = 0$
-
-tal que $Z_{jt}$ é o vetor de instrumentos. Substituindo $\xi_{jt}$, $\varepsilon_{jt}$ e (4) na equação de momentos, temos:
-
-$E[(y_{jt} - \beta_0 - \beta_k k_{jt} - \beta_l l_{jt} -\rho(\hat{\Phi_{t-1}}(k_{jt-1}, l_{jt-1},m_{jt-1}) - \beta_{0} - \beta_k k_{jt-1} - \beta_l l_{jt-1}))  \times \begin{pmatrix} 
-  1 \\ 
-  k_{jt} \\
-  l_{jt-1} \\
-  \hat{\Phi_{t-1}}(k_{jt-1}, l_{jt-1},m_{jt-1})
-  \end{pmatrix}]$  (5)
-
-O termo $\hat{\rho}$ pode ser estimado usando a estrutura AR(1) da produtividade $\omega_{jt} = \rho \omega_{jt−1} + \xi_{jt}$. Isto é, o momento necessário para estimar $\hat{\rho}$ não é incluido no sistema GMM. Portanto, para cada loop do algoritmo de estimação é possível estimar o $\hat{\rho}$ com base na produtividade.
-Para reduzir o problema, estime $\beta_0$ no primeiro estágio, $\tilde{\beta_0}$, e substitua em (5). Alternativamente, se for conveniente assuma um valor fixo para $\hat{\rho}$, por
-exemplo 0.9528. Dado isso, o modelo a ser estimado simplificado para
-
-$E[(y_{jt} - \tilde{\beta_0} - \beta_k k_{jt} - \beta_l l_{jt} -\hat{\rho}(\hat{\Phi_{t-1}}(k_{jt-1}, l_{jt-1},m_{jt-1})- \tilde{beta_0} - \beta_k k_{jt-1} - \beta_l l_{jt-1}))  \times \begin{pmatrix} 
-  k_{jt} \\
-  l_{jt-1} \\
-\end{pmatrix}]$ (6)
-
-Observe que este modelo é exatamente identificado.
+\PY{n}{df} \PY{o}{=} \PY{n}{chilean}\PY{o}{.}\PY{n}{rename}\PY{p}{(}\PY{n}{columns}\PY{o}{=}\PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Y}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{y}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{sX}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pX}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{m}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{fX1}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{fx1}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{fX2}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{fx2}\PY{l+s+s1}{\PYZsq{}}\PY{p}{\PYZcb{}}\PY{p}{)}\PY{o}{.}\PY{n}{copy}\PY{p}{(}\PY{p}{)}
 
 
-Base de dados
+\PY{c+c1}{\PYZsh{} l = ln(exp(fx1) + exp(fx2))}
+\PY{n}{df}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{l}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{log}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{exp}\PY{p}{(}\PY{n}{df}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{fx1}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{)} \PY{o}{+} \PY{n}{np}\PY{o}{.}\PY{n}{exp}\PY{p}{(}\PY{n}{df}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{fx2}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{)}\PY{p}{)}
 
-A base é de firmas chilenas de 1996 a 2006. As variáveis são:
+\PY{c+c1}{\PYZsh{} Selecionar variáveis relevantes e criar uma cópia explícita}
+\PY{n}{df\PYZus{}panel} \PY{o}{=} \PY{n}{df}\PY{p}{[}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{idvar}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{timevar}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{y}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{l}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{m}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{]}\PY{o}{.}\PY{n}{copy}\PY{p}{(}\PY{p}{)}
 
-• Y : ln do produto deflacionado, medido como valor adicionado
+\PY{c+c1}{\PYZsh{} Ordenar dados para lagging}
+\PY{n}{df\PYZus{}panel}\PY{o}{.}\PY{n}{sort\PYZus{}values}\PY{p}{(}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{idvar}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{timevar}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{inplace}\PY{o}{=}\PY{k+kc}{True}\PY{p}{)}
 
-• sX : ln do estoque de capital deflacionado (k)
+\PY{c+c1}{\PYZsh{} Primeiro Estágio: OLS}
 
-• fX1 : ln do emprego 1 (blue c)
+\PY{c+c1}{\PYZsh{} Criar termos polinomiais de 4ª ordem para f\PYZca{}\PYZhy{}1(k, l, m)}
+\PY{n}{X\PYZus{}stage1} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{DataFrame}\PY{p}{(}\PY{n}{index}\PY{o}{=}\PY{n}{df\PYZus{}panel}\PY{o}{.}\PY{n}{index}\PY{p}{)}
+\PY{n}{X\PYZus{}stage1}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{const}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{l+m+mi}{1}
+\PY{n}{X\PYZus{}stage1}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}
+\PY{n}{X\PYZus{}stage1}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{l}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{l}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}
 
-• fX2 : ln do emprego 2 (white c)
+\PY{c+c1}{\PYZsh{} \PYZdl{}\PYZbs{}sum\PYZus{}\PYZob{}i=0\PYZcb{}\PYZca{}4 \PYZbs{}beta k\PYZca{}i * l\PYZca{}\PYZob{}4\PYZhy{}i\PYZcb{}\PYZdl{}}
+\PY{n}{X\PYZus{}stage1}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{l\PYZus{}4}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{l}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{4}
+\PY{n}{X\PYZus{}stage1}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k\PYZus{}l\PYZus{}3}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{*} \PY{p}{(}\PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{l}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{3}\PY{p}{)}
+\PY{n}{X\PYZus{}stage1}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k2\PYZus{}l2}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{p}{(}\PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{p}{)} \PY{o}{*} \PY{p}{(}\PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{l}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{p}{)}
+\PY{n}{X\PYZus{}stage1}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k3\PYZus{}l}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{p}{(}\PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{3}\PY{p}{)} \PY{o}{*} \PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{l}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}
+\PY{n}{X\PYZus{}stage1}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k\PYZus{}4}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{4}
 
-• pX : ln de materiais (m)
+\PY{c+c1}{\PYZsh{} m\PYZca{}4 + k*m\PYZca{}3 + k\PYZca{}2*m\PYZca{}2 + k\PYZca{}3*m (k\PYZca{}4 já foi definido)}
+\PY{n}{X\PYZus{}stage1}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{m\PYZus{}4}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{m}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{4}
+\PY{n}{X\PYZus{}stage1}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k\PYZus{}m\PYZus{}3}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{*} \PY{p}{(}\PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{m}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{3}\PY{p}{)}
+\PY{n}{X\PYZus{}stage1}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k2\PYZus{}m2}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{p}{(}\PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{p}{)} \PY{o}{*} \PY{p}{(}\PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{m}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{p}{)}
+\PY{n}{X\PYZus{}stage1}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k3\PYZus{}m}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{p}{(}\PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{3}\PY{p}{)} \PY{o}{*} \PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{m}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}
 
-• cX : ln do investimento deflacionado
+\PY{c+c1}{\PYZsh{} m*l\PYZca{}3 + m\PYZca{}2*l\PYZca{}2 + m\PYZca{}3*l (l\PYZca{}4 e m\PYZca{}4 já foram definidos)}
+\PY{n}{X\PYZus{}stage1}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{m\PYZus{}l\PYZus{}3}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{m}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{*} \PY{p}{(}\PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{l}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{3}\PY{p}{)}
+\PY{n}{X\PYZus{}stage1}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{m2\PYZus{}l2}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{p}{(}\PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{m}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{p}{)} \PY{o}{*} \PY{p}{(}\PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{l}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{p}{)}
+\PY{n}{X\PYZus{}stage1}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{m3\PYZus{}l}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{p}{(}\PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{m}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{3}\PY{p}{)} \PY{o}{*} \PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{l}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}
 
-• inv = cX
+\PY{n}{y\PYZus{}stage1} \PY{o}{=} \PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{y}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}
 
-• idvar : id firma
 
-• timevar : id tempo (ano)
+\PY{n}{data\PYZus{}stage1\PYZus{}full} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{concat}\PY{p}{(}\PY{p}{[}\PY{n}{y\PYZus{}stage1}\PY{p}{,} \PY{n}{X\PYZus{}stage1}\PY{p}{]}\PY{p}{,} \PY{n}{axis}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{)}
+\PY{n}{data\PYZus{}stage1\PYZus{}clean} \PY{o}{=} \PY{n}{data\PYZus{}stage1\PYZus{}full}\PY{o}{.}\PY{n}{dropna}\PY{p}{(}\PY{p}{)}
 
-A medida de emprego a ser usada deve ser a soma de fX1 e fX2.
+\PY{n}{y\PYZus{}stage1\PYZus{}clean} \PY{o}{=} \PY{n}{data\PYZus{}stage1\PYZus{}clean}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{y}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}
+\PY{n}{X\PYZus{}stage1\PYZus{}clean} \PY{o}{=} \PY{n}{data\PYZus{}stage1\PYZus{}clean}\PY{o}{.}\PY{n}{drop}\PY{p}{(}\PY{n}{columns}\PY{o}{=}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{y}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{)}
 
+\PY{n}{model\PYZus{}stage1} \PY{o}{=} \PY{n}{sm}\PY{o}{.}\PY{n}{OLS}\PY{p}{(}\PY{n}{y\PYZus{}stage1\PYZus{}clean}\PY{p}{,} \PY{n}{X\PYZus{}stage1\PYZus{}clean}\PY{p}{)}
+\PY{n}{results\PYZus{}stage1} \PY{o}{=} \PY{n}{model\PYZus{}stage1}\PY{o}{.}\PY{n}{fit}\PY{p}{(}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{n}{results\PYZus{}stage1}\PY{o}{.}\PY{n}{summary}\PY{p}{(}\PY{p}{)}\PY{p}{)}
+
+\PY{n}{beta\PYZus{}0\PYZus{}tilde} \PY{o}{=} \PY{n}{results\PYZus{}stage1}\PY{o}{.}\PY{n}{params}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{const}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+se}{\PYZbs{}n}\PY{l+s+s2}{ Intercepto do primeiro estágio: }\PY{l+s+si}{\PYZob{}}\PY{n}{beta\PYZus{}0\PYZus{}tilde}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} Calcular Phi\PYZus{}hat e adicionar de volta ao df\PYZus{}panel original usando o índice}
+\PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Phi\PYZus{}hat}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{nan}
+\PY{n}{df\PYZus{}panel}\PY{o}{.}\PY{n}{loc}\PY{p}{[}\PY{n}{X\PYZus{}stage1\PYZus{}clean}\PY{o}{.}\PY{n}{index}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Phi\PYZus{}hat}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{results\PYZus{}stage1}\PY{o}{.}\PY{n}{predict}\PY{p}{(}\PY{n}{X\PYZus{}stage1\PYZus{}clean}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+                            OLS Regression Results
+==============================================================================
+Dep. Variable:                      y   R-squared:                       0.824
+Model:                            OLS   Adj. R-squared:                  0.823
+Method:                 Least Squares   F-statistic:                     843.9
+Date:                Fri, 20 Jun 2025   Prob (F-statistic):               0.00
+Time:                        16:57:44   Log-Likelihood:                -2369.4
+No. Observations:                2544   AIC:                             4769.
+Df Residuals:                    2529   BIC:                             4856.
+Df Model:                          14
+Covariance Type:            nonrobust
+==============================================================================
+                 coef    std err          t      P>|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+const          9.2094      0.140     65.592      0.000       8.934       9.485
+k              0.0015      0.019      0.078      0.937      -0.036       0.039
+l              1.0511      0.047     22.236      0.000       0.958       1.144
+l\_4           -0.0132      0.005     -2.724      0.006      -0.023      -0.004
+k\_l\_3          0.0096      0.005      1.788      0.074      -0.001       0.020
+k2\_l2         -0.0012      0.002     -0.639      0.523      -0.005       0.003
+k3\_l          -0.0006      0.000     -2.216      0.027      -0.001   -7.06e-05
+k\_4            0.0002   1.94e-05      8.620      0.000       0.000       0.000
+m\_4            0.0055      0.001      6.179      0.000       0.004       0.007
+k\_m\_3         -0.0097      0.001     -7.630      0.000      -0.012      -0.007
+k2\_m2          0.0049      0.001      7.245      0.000       0.004       0.006
+k3\_m          -0.0008      0.000     -5.480      0.000      -0.001      -0.001
+m\_l\_3          0.0092      0.003      3.152      0.002       0.003       0.015
+m2\_l2         -0.0160      0.004     -4.533      0.000      -0.023      -0.009
+m3\_l           0.0082      0.002      4.881      0.000       0.005       0.012
+==============================================================================
+Omnibus:                       79.225   Durbin-Watson:                   0.700
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              169.446
+Skew:                           0.178   Prob(JB):                     1.60e-37
+Kurtosis:                       4.213   Cond. No.                     3.52e+05
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly
+specified.
+[2] The condition number is large, 3.52e+05. This might indicate that there are
+strong multicollinearity or other numerical problems.
+
+ Intercepto do primeiro estágio: 9.209416673947127
+    \end{Verbatim}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{3}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{c+c1}{\PYZsh{} Segundo Estágio: GMM}
+
+\PY{c+c1}{\PYZsh{} Criar variáveis defasadas (k\PYZus{}\PYZob{}t\PYZhy{}1\PYZcb{}, l\PYZus{}\PYZob{}t\PYZhy{}1\PYZcb{}, Phi\PYZus{}hat\PYZus{}\PYZob{}t\PYZhy{}1\PYZcb{})}
+\PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k\PYZus{}lag1}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{df\PYZus{}panel}\PY{o}{.}\PY{n}{groupby}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{idvar}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{.}\PY{n}{shift}\PY{p}{(}\PY{l+m+mi}{1}\PY{p}{)}
+\PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{l\PYZus{}lag1}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{df\PYZus{}panel}\PY{o}{.}\PY{n}{groupby}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{idvar}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{l}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{.}\PY{n}{shift}\PY{p}{(}\PY{l+m+mi}{1}\PY{p}{)}
+\PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Phi\PYZus{}hat\PYZus{}lag1}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{df\PYZus{}panel}\PY{o}{.}\PY{n}{groupby}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{idvar}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Phi\PYZus{}hat}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{.}\PY{n}{shift}\PY{p}{(}\PY{l+m+mi}{1}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} Selecionar apenas as colunas necessárias para o GMM}
+\PY{n}{df\PYZus{}stage2} \PY{o}{=} \PY{n}{df\PYZus{}panel}\PY{p}{[}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{y}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{l}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Phi\PYZus{}hat\PYZus{}lag1}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k\PYZus{}lag1}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{l\PYZus{}lag1}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{]}\PY{o}{.}\PY{n}{dropna}\PY{p}{(}\PY{p}{)}
+
+\PY{n}{y\PYZus{}jt} \PY{o}{=} \PY{n}{df\PYZus{}stage2}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{y}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{.}\PY{n}{values}
+\PY{n}{k\PYZus{}jt} \PY{o}{=} \PY{n}{df\PYZus{}stage2}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{.}\PY{n}{values}
+\PY{n}{l\PYZus{}jt} \PY{o}{=} \PY{n}{df\PYZus{}stage2}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{l}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{.}\PY{n}{values}
+\PY{n}{Phi\PYZus{}hat\PYZus{}t\PYZus{}minus\PYZus{}1} \PY{o}{=} \PY{n}{df\PYZus{}stage2}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Phi\PYZus{}hat\PYZus{}lag1}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{.}\PY{n}{values}
+\PY{n}{k\PYZus{}jt\PYZus{}minus\PYZus{}1} \PY{o}{=} \PY{n}{df\PYZus{}stage2}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{k\PYZus{}lag1}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{.}\PY{n}{values}
+\PY{n}{l\PYZus{}jt\PYZus{}minus\PYZus{}1} \PY{o}{=} \PY{n}{df\PYZus{}stage2}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{l\PYZus{}lag1}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{.}\PY{n}{values}
+
+\PY{n}{rho\PYZus{}hat} \PY{o}{=} \PY{l+m+mf}{0.9528} \PY{c+c1}{\PYZsh{} Valor fixo conforme a questão}
+
+\PY{c+c1}{\PYZsh{} Função de momentos para GMM}
+\PY{k}{def} \PY{n+nf}{gmm\PYZus{}moments}\PY{p}{(}\PY{n}{params\PYZus{}gmm}\PY{p}{)}\PY{p}{:}
+    \PY{n}{beta\PYZus{}k}\PY{p}{,} \PY{n}{beta\PYZus{}l} \PY{o}{=} \PY{n}{params\PYZus{}gmm}
+    
+    \PY{c+c1}{\PYZsh{} Resíduo u\PYZus{}jt da Equação (6)}
+    \PY{c+c1}{\PYZsh{} u\PYZus{}jt = y\PYZus{}jt \PYZhy{} beta\PYZus{}0\PYZus{}tilde \PYZhy{} beta\PYZus{}k*k\PYZus{}jt \PYZhy{} beta\PYZus{}l*l\PYZus{}jt \PYZhy{} rho\PYZus{}hat * (Phi\PYZus{}hat\PYZus{}\PYZob{}t\PYZhy{}1\PYZcb{} \PYZhy{} beta\PYZus{}0\PYZus{}tilde \PYZhy{} beta\PYZus{}k*k\PYZus{}\PYZob{}t\PYZhy{}1\PYZcb{} \PYZhy{} beta\PYZus{}l*l\PYZus{}\PYZob{}t\PYZhy{}1\PYZcb{})}
+    
+    \PY{n}{term\PYZus{}current\PYZus{}prod} \PY{o}{=} \PY{n}{y\PYZus{}jt} \PY{o}{\PYZhy{}} \PY{n}{beta\PYZus{}0\PYZus{}tilde} \PY{o}{\PYZhy{}} \PY{n}{beta\PYZus{}k} \PY{o}{*} \PY{n}{k\PYZus{}jt} \PY{o}{\PYZhy{}} \PY{n}{beta\PYZus{}l} \PY{o}{*} \PY{n}{l\PYZus{}jt}
+    \PY{n}{term\PYZus{}lagged\PYZus{}prod\PYZus{}expectation} \PY{o}{=} \PY{n}{Phi\PYZus{}hat\PYZus{}t\PYZus{}minus\PYZus{}1} \PY{o}{\PYZhy{}} \PY{n}{beta\PYZus{}0\PYZus{}tilde} \PY{o}{\PYZhy{}} \PY{n}{beta\PYZus{}k} \PY{o}{*} \PY{n}{k\PYZus{}jt\PYZus{}minus\PYZus{}1} \PY{o}{\PYZhy{}} \PY{n}{beta\PYZus{}l} \PY{o}{*} \PY{n}{l\PYZus{}jt\PYZus{}minus\PYZus{}1}
+    
+    \PY{n}{u\PYZus{}jt} \PY{o}{=} \PY{n}{term\PYZus{}current\PYZus{}prod} \PY{o}{\PYZhy{}} \PY{n}{rho\PYZus{}hat} \PY{o}{*} \PY{n}{term\PYZus{}lagged\PYZus{}prod\PYZus{}expectation}
+    
+    \PY{c+c1}{\PYZsh{} Condições de momento E[u\PYZus{}jt * Z\PYZus{}jt] = 0}
+    \PY{c+c1}{\PYZsh{} Z\PYZus{}jt = [k\PYZus{}jt, l\PYZus{}jt\PYZus{}minus\PYZus{}1]}
+    \PY{n}{moment1} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{mean}\PY{p}{(}\PY{n}{u\PYZus{}jt} \PY{o}{*} \PY{n}{k\PYZus{}jt}\PY{p}{)}           \PY{c+c1}{\PYZsh{} Instrumento: k\PYZus{}jt}
+    \PY{n}{moment2} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{mean}\PY{p}{(}\PY{n}{u\PYZus{}jt} \PY{o}{*} \PY{n}{l\PYZus{}jt\PYZus{}minus\PYZus{}1}\PY{p}{)}   \PY{c+c1}{\PYZsh{} Instrumento: l\PYZus{}jt\PYZhy{}1}
+    
+    \PY{k}{return} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{n}{moment1}\PY{p}{,} \PY{n}{moment2}\PY{p}{]}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} Função objetivo para GMM (soma dos quadrados dos momentos)}
+\PY{c+c1}{\PYZsh{} Para GMM exatamente identificado, a matriz de ponderação W pode ser a identidade.}
+\PY{k}{def} \PY{n+nf}{gmm\PYZus{}objective}\PY{p}{(}\PY{n}{params\PYZus{}gmm}\PY{p}{)}\PY{p}{:}
+    \PY{n}{moments} \PY{o}{=} \PY{n}{gmm\PYZus{}moments}\PY{p}{(}\PY{n}{params\PYZus{}gmm}\PY{p}{)}
+    \PY{k}{return} \PY{n}{np}\PY{o}{.}\PY{n}{sum}\PY{p}{(}\PY{n}{moments}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{p}{)} \PY{c+c1}{\PYZsh{} Equivalente a m\PYZsq{}I m}
+
+\PY{c+c1}{\PYZsh{} Valores iniciais para beta\PYZus{}k, beta\PYZus{}l (podem vir de um OLS simples ou serem arbitrários razoáveis)}
+\PY{c+c1}{\PYZsh{} Usando os coeficientes de k e l do primeiro estágio como ponto de partida.}
+\PY{c+c1}{\PYZsh{} Valores iniciais comuns para elasticidades.}
+\PY{n}{initial\PYZus{}params\PYZus{}gmm} \PY{o}{=} \PY{p}{[}\PY{l+m+mf}{0.1}\PY{p}{,} \PY{l+m+mf}{0.6}\PY{p}{]} 
+
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+se}{\PYZbs{}n}\PY{l+s+s2}{Segundo Estágio \PYZhy{} GMM:}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{c+c1}{\PYZsh{} Otimização usando Nelder\PYZhy{}Mead (análogo ao fminsearch do Matlab)}
+\PY{n}{result\PYZus{}gmm} \PY{o}{=} \PY{n}{minimize}\PY{p}{(}\PY{n}{gmm\PYZus{}objective}\PY{p}{,} \PY{n}{initial\PYZus{}params\PYZus{}gmm}\PY{p}{,} \PY{n}{method}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Nelder\PYZhy{}Mead}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Optimization successful.}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{beta\PYZus{}k\PYZus{}gmm}\PY{p}{,} \PY{n}{beta\PYZus{}l\PYZus{}gmm} \PY{o}{=} \PY{n}{result\PYZus{}gmm}\PY{o}{.}\PY{n}{x}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{   Final GMM objective function value: }\PY{l+s+si}{\PYZob{}}\PY{n}{result\PYZus{}gmm}\PY{o}{.}\PY{n}{fun}\PY{l+s+si}{:}\PY{l+s+s2}{.6e}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{   Estimated beta\PYZus{}k: }\PY{l+s+si}{\PYZob{}}\PY{n}{beta\PYZus{}k\PYZus{}gmm}\PY{l+s+si}{:}\PY{l+s+s2}{.4f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{   Estimated beta\PYZus{}l: }\PY{l+s+si}{\PYZob{}}\PY{n}{beta\PYZus{}l\PYZus{}gmm}\PY{l+s+si}{:}\PY{l+s+s2}{.4f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+
+Segundo Estágio - GMM:
+Optimization successful.
+   Final GMM objective function value: 6.993736e-12
+   Estimated beta\_k: 0.3618
+   Estimated beta\_l: -0.1739
+    \end{Verbatim}
+
+    \begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Calcule a estatística de Wald (F)
+\end{enumerate}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{4}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{from} \PY{n+nn}{scipy}\PY{n+nn}{.}\PY{n+nn}{stats} \PY{k+kn}{import} \PY{n}{f} \PY{k}{as} \PY{n}{f\PYZus{}dist}
+\PY{k+kn}{import} \PY{n+nn}{numpy} \PY{k}{as} \PY{n+nn}{np}
+
+\PY{n}{N\PYZus{}gmm} \PY{o}{=} \PY{n+nb}{len}\PY{p}{(}\PY{n}{y\PYZus{}jt}\PY{p}{)} \PY{c+c1}{\PYZsh{} Número de observações na estimação GMM}
+\PY{n}{K\PYZus{}params} \PY{o}{=} \PY{l+m+mi}{2}      \PY{c+c1}{\PYZsh{} Número de parâmetros estimados (beta\PYZus{}k, beta\PYZus{}l)}
+\PY{n}{q\PYZus{}restrictions} \PY{o}{=} \PY{l+m+mi}{2} \PY{c+c1}{\PYZsh{} Número de restrições (beta\PYZus{}k=0, beta\PYZus{}l=0)}
+
+\PY{c+c1}{\PYZsh{} 1. Calcular as derivadas parciais de u\PYZus{}jt em relação a beta\PYZus{}k e beta\PYZus{}l}
+\PY{c+c1}{\PYZsh{} u\PYZus{}jt = y\PYZus{}jt \PYZhy{} beta\PYZus{}0\PYZus{}tilde \PYZhy{} beta\PYZus{}k*k\PYZus{}jt \PYZhy{} beta\PYZus{}l*l\PYZus{}jt \PYZhy{} rho\PYZus{}hat * (Phi\PYZus{}hat\PYZus{}t\PYZus{}minus\PYZus{}1 \PYZhy{} beta\PYZus{}0\PYZus{}tilde \PYZhy{} beta\PYZus{}k*k\PYZus{}jt\PYZus{}minus\PYZus{}1 \PYZhy{} beta\PYZus{}l*l\PYZus{}jt\PYZus{}minus\PYZus{}1)}
+\PY{c+c1}{\PYZsh{} d(u\PYZus{}jt)/d(beta\PYZus{}k) = \PYZhy{}k\PYZus{}jt + rho\PYZus{}hat * k\PYZus{}jt\PYZus{}minus\PYZus{}1}
+\PY{c+c1}{\PYZsh{} d(u\PYZus{}jt)/d(beta\PYZus{}l) = \PYZhy{}l\PYZus{}jt + rho\PYZus{}hat * l\PYZus{}jt\PYZus{}minus\PYZus{}1}
+
+\PY{n}{du\PYZus{}dbk} \PY{o}{=} \PY{o}{\PYZhy{}}\PY{n}{k\PYZus{}jt} \PY{o}{+} \PY{n}{rho\PYZus{}hat} \PY{o}{*} \PY{n}{k\PYZus{}jt\PYZus{}minus\PYZus{}1}
+\PY{n}{du\PYZus{}dbl} \PY{o}{=} \PY{o}{\PYZhy{}}\PY{n}{l\PYZus{}jt} \PY{o}{+} \PY{n}{rho\PYZus{}hat} \PY{o}{*} \PY{n}{l\PYZus{}jt\PYZus{}minus\PYZus{}1}
+
+\PY{c+c1}{\PYZsh{} 2. Calcular G\PYZus{}hat (Jacobiano médio das condições de momento)}
+\PY{c+c1}{\PYZsh{} Instrumentos Z\PYZus{}jt = [k\PYZus{}jt, l\PYZus{}jt\PYZus{}minus\PYZus{}1]}
+\PY{c+c1}{\PYZsh{} G\PYZus{}hat é uma matriz 2x2, onde G\PYZus{}hat[i,j] = mean( Z\PYZus{}i * d(u\PYZus{}jt)/d(beta\PYZus{}j) )}
+\PY{c+c1}{\PYZsh{} G\PYZus{}hat = E[Z\PYZus{}jt * (du/d\PYZus{}beta)\PYZsq{}]}
+\PY{c+c1}{\PYZsh{} G\PYZus{}hat\PYZus{}row1 = [mean(k\PYZus{}jt * du\PYZus{}dbk), mean(k\PYZus{}jt * du\PYZus{}dbl)]}
+\PY{c+c1}{\PYZsh{} G\PYZus{}hat\PYZus{}row2 = [mean(l\PYZus{}jt\PYZus{}minus\PYZus{}1 * du\PYZus{}dbk), mean(l\PYZus{}jt\PYZus{}minus\PYZus{}1 * du\PYZus{}dbl)]}
+\PY{c+c1}{\PYZsh{} No entanto, a formulação padrão para V\PYZus{}cov usa G = E[ (du/d\PYZus{}beta) * Z\PYZsq{} ]}
+\PY{c+c1}{\PYZsh{} G\PYZus{}hat\PYZus{}col1 = [mean(du\PYZus{}dbk * k\PYZus{}jt), mean(du\PYZus{}dbk * l\PYZus{}jt\PYZus{}minus\PYZus{}1)]}
+\PY{c+c1}{\PYZsh{} G\PYZus{}hat\PYZus{}col2 = [mean(du\PYZus{}dbl * k\PYZus{}jt), mean(du\PYZus{}dbl * l\PYZus{}jt\PYZus{}minus\PYZus{}1)]}
+
+\PY{n}{G\PYZus{}hat\PYZus{}11} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{mean}\PY{p}{(}\PY{n}{du\PYZus{}dbk} \PY{o}{*} \PY{n}{k\PYZus{}jt}\PY{p}{)}
+\PY{n}{G\PYZus{}hat\PYZus{}12} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{mean}\PY{p}{(}\PY{n}{du\PYZus{}dbl} \PY{o}{*} \PY{n}{k\PYZus{}jt}\PY{p}{)}
+\PY{n}{G\PYZus{}hat\PYZus{}21} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{mean}\PY{p}{(}\PY{n}{du\PYZus{}dbk} \PY{o}{*} \PY{n}{l\PYZus{}jt\PYZus{}minus\PYZus{}1}\PY{p}{)}
+\PY{n}{G\PYZus{}hat\PYZus{}22} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{mean}\PY{p}{(}\PY{n}{du\PYZus{}dbl} \PY{o}{*} \PY{n}{l\PYZus{}jt\PYZus{}minus\PYZus{}1}\PY{p}{)}
+\PY{n}{G\PYZus{}hat} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{p}{[}\PY{n}{G\PYZus{}hat\PYZus{}11}\PY{p}{,} \PY{n}{G\PYZus{}hat\PYZus{}12}\PY{p}{]}\PY{p}{,} \PY{p}{[}\PY{n}{G\PYZus{}hat\PYZus{}21}\PY{p}{,} \PY{n}{G\PYZus{}hat\PYZus{}22}\PY{p}{]}\PY{p}{]}\PY{p}{)}
+
+
+\PY{c+c1}{\PYZsh{} 3. Calcular resíduos u\PYZus{}jt\PYZus{}hat com os parâmetros GMM estimados}
+\PY{n}{term\PYZus{}current\PYZus{}prod\PYZus{}hat} \PY{o}{=} \PY{n}{y\PYZus{}jt} \PY{o}{\PYZhy{}} \PY{n}{beta\PYZus{}0\PYZus{}tilde} \PY{o}{\PYZhy{}} \PY{n}{beta\PYZus{}k\PYZus{}gmm} \PY{o}{*} \PY{n}{k\PYZus{}jt} \PY{o}{\PYZhy{}} \PY{n}{beta\PYZus{}l\PYZus{}gmm} \PY{o}{*} \PY{n}{l\PYZus{}jt}
+\PY{n}{term\PYZus{}lagged\PYZus{}prod\PYZus{}expectation\PYZus{}hat} \PY{o}{=} \PY{n}{Phi\PYZus{}hat\PYZus{}t\PYZus{}minus\PYZus{}1} \PY{o}{\PYZhy{}} \PY{n}{beta\PYZus{}0\PYZus{}tilde} \PY{o}{\PYZhy{}} \PY{n}{beta\PYZus{}k\PYZus{}gmm} \PY{o}{*} \PY{n}{k\PYZus{}jt\PYZus{}minus\PYZus{}1} \PY{o}{\PYZhy{}} \PY{n}{beta\PYZus{}l\PYZus{}gmm} \PY{o}{*} \PY{n}{l\PYZus{}jt\PYZus{}minus\PYZus{}1}
+\PY{n}{u\PYZus{}jt\PYZus{}hat} \PY{o}{=} \PY{n}{term\PYZus{}current\PYZus{}prod\PYZus{}hat} \PY{o}{\PYZhy{}} \PY{n}{rho\PYZus{}hat} \PY{o}{*} \PY{n}{term\PYZus{}lagged\PYZus{}prod\PYZus{}expectation\PYZus{}hat}
+
+\PY{c+c1}{\PYZsh{} 4. Calcular contribuições individuais para os momentos m\PYZus{}it = u\PYZus{}jt\PYZus{}hat * Z\PYZus{}it}
+\PY{c+c1}{\PYZsh{} m\PYZus{}t = [u\PYZus{}jt\PYZus{}hat * k\PYZus{}jt, u\PYZus{}jt\PYZus{}hat * l\PYZus{}jt\PYZus{}minus\PYZus{}1]}
+\PY{n}{m1\PYZus{}t\PYZus{}hat} \PY{o}{=} \PY{n}{u\PYZus{}jt\PYZus{}hat} \PY{o}{*} \PY{n}{k\PYZus{}jt}
+\PY{n}{m2\PYZus{}t\PYZus{}hat} \PY{o}{=} \PY{n}{u\PYZus{}jt\PYZus{}hat} \PY{o}{*} \PY{n}{l\PYZus{}jt\PYZus{}minus\PYZus{}1}
+
+\PY{c+c1}{\PYZsh{} 5. Calcular Omega\PYZus{}hat (matriz de variância\PYZhy{}covariância dos momentos m\PYZus{}t)}
+\PY{c+c1}{\PYZsh{} Omega\PYZus{}hat[i,j] = mean(m\PYZus{}it * m\PYZus{}jt)}
+\PY{n}{Omega\PYZus{}hat\PYZus{}11} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{mean}\PY{p}{(}\PY{n}{m1\PYZus{}t\PYZus{}hat}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{p}{)}
+\PY{n}{Omega\PYZus{}hat\PYZus{}12} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{mean}\PY{p}{(}\PY{n}{m1\PYZus{}t\PYZus{}hat} \PY{o}{*} \PY{n}{m2\PYZus{}t\PYZus{}hat}\PY{p}{)} \PY{c+c1}{\PYZsh{} = mean(m2\PYZus{}t\PYZus{}hat * m1\PYZus{}t\PYZus{}hat)}
+\PY{n}{Omega\PYZus{}hat\PYZus{}22} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{mean}\PY{p}{(}\PY{n}{m2\PYZus{}t\PYZus{}hat}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{p}{)}
+\PY{n}{Omega\PYZus{}hat} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{p}{[}\PY{n}{Omega\PYZus{}hat\PYZus{}11}\PY{p}{,} \PY{n}{Omega\PYZus{}hat\PYZus{}12}\PY{p}{]}\PY{p}{,} \PY{p}{[}\PY{n}{Omega\PYZus{}hat\PYZus{}12}\PY{p}{,} \PY{n}{Omega\PYZus{}hat\PYZus{}22}\PY{p}{]}\PY{p}{]}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} 6. Calcular a matriz de variância\PYZhy{}covariância dos estimadores GMM}
+\PY{c+c1}{\PYZsh{} Para GMM exatamente identificado (W=I), V\PYZus{}cov(beta\PYZus{}hat) = (1/N) * (G\PYZus{}hat\PYZsq{} * G\PYZus{}hat)\PYZca{}\PYZhy{}1 * (G\PYZus{}hat\PYZsq{} * Omega\PYZus{}hat * G\PYZus{}hat) * (G\PYZus{}hat\PYZsq{} * G\PYZus{}hat)\PYZca{}\PYZhy{}1}
+\PY{c+c1}{\PYZsh{} Ou, de forma mais simples para o caso exatamente identificado: V\PYZus{}cov(beta\PYZus{}hat) = (1/N) * (G\PYZus{}hat\PYZca{}\PYZhy{}1) * Omega\PYZus{}hat * (G\PYZus{}hat\PYZsq{}\PYZca{}\PYZhy{}1)}
+
+\PY{n}{G\PYZus{}hat\PYZus{}inv} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{linalg}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{n}{G\PYZus{}hat}\PY{p}{)}
+\PY{n}{V\PYZus{}cov\PYZus{}beta\PYZus{}hat\PYZus{}no\PYZus{}N} \PY{o}{=} \PY{n}{G\PYZus{}hat\PYZus{}inv} \PY{o}{@} \PY{n}{Omega\PYZus{}hat} \PY{o}{@} \PY{n}{G\PYZus{}hat\PYZus{}inv}\PY{o}{.}\PY{n}{T} \PY{c+c1}{\PYZsh{} (G\PYZus{}hat\PYZsq{})\PYZca{}\PYZob{}\PYZhy{}1\PYZcb{} = (G\PYZus{}hat\PYZca{}\PYZob{}\PYZhy{}1\PYZcb{})\PYZsq{}}
+\PY{n}{V\PYZus{}cov\PYZus{}beta\PYZus{}hat} \PY{o}{=} \PY{p}{(}\PY{l+m+mi}{1}\PY{o}{/}\PY{n}{N\PYZus{}gmm}\PY{p}{)} \PY{o}{*} \PY{n}{V\PYZus{}cov\PYZus{}beta\PYZus{}hat\PYZus{}no\PYZus{}N}
+
+\PY{c+c1}{\PYZsh{} 7. Hipótese Nula H0: beta\PYZus{}k = 0, beta\PYZus{}l = 0}
+\PY{n}{beta\PYZus{}gmm\PYZus{}estimated} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{n}{beta\PYZus{}k\PYZus{}gmm}\PY{p}{,} \PY{n}{beta\PYZus{}l\PYZus{}gmm}\PY{p}{]}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} 8. Estatística de Wald (Chi\PYZhy{}quadrado)}
+\PY{c+c1}{\PYZsh{} W = beta\PYZus{}hat\PYZsq{} * [V\PYZus{}cov(beta\PYZus{}hat)]\PYZca{}\PYZhy{}1 * beta\PYZus{}hat}
+\PY{n}{V\PYZus{}cov\PYZus{}beta\PYZus{}hat\PYZus{}inv} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{linalg}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{n}{V\PYZus{}cov\PYZus{}beta\PYZus{}hat}\PY{p}{)}
+\PY{n}{W\PYZus{}stat} \PY{o}{=} \PY{n}{beta\PYZus{}gmm\PYZus{}estimated}\PY{o}{.}\PY{n}{T} \PY{o}{@} \PY{n}{V\PYZus{}cov\PYZus{}beta\PYZus{}hat\PYZus{}inv} \PY{o}{@} \PY{n}{beta\PYZus{}gmm\PYZus{}estimated}
+
+\PY{c+c1}{\PYZsh{} 9. Estatística F de Wald}
+\PY{n}{F\PYZus{}stat} \PY{o}{=} \PY{n}{W\PYZus{}stat} \PY{o}{/} \PY{n}{q\PYZus{}restrictions}
+
+\PY{c+c1}{\PYZsh{} 10. P\PYZhy{}valor para a estatística F}
+\PY{c+c1}{\PYZsh{} Graus de liberdade: q\PYZus{}restrictions (numerador), N\PYZus{}gmm \PYZhy{} K\PYZus{}params (denominador)}
+\PY{n}{p\PYZus{}value\PYZus{}F} \PY{o}{=} \PY{l+m+mi}{1} \PY{o}{\PYZhy{}} \PY{n}{f\PYZus{}dist}\PY{o}{.}\PY{n}{cdf}\PY{p}{(}\PY{n}{F\PYZus{}stat}\PY{p}{,} \PY{n}{q\PYZus{}restrictions}\PY{p}{,} \PY{n}{N\PYZus{}gmm} \PY{o}{\PYZhy{}} \PY{n}{K\PYZus{}params}\PY{p}{)}
+
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+se}{\PYZbs{}n}\PY{l+s+s2}{Teste de Wald para significância conjunta de beta\PYZus{}k e beta\PYZus{}l (H0: beta\PYZus{}k=0, beta\PYZus{}l=0):}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{   Número de observações (GMM): }\PY{l+s+si}{\PYZob{}}\PY{n}{N\PYZus{}gmm}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{   Matriz G\PYZus{}hat:}\PY{l+s+se}{\PYZbs{}n}\PY{l+s+si}{\PYZob{}}\PY{n}{G\PYZus{}hat}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{   Matriz Omega\PYZus{}hat:}\PY{l+s+se}{\PYZbs{}n}\PY{l+s+si}{\PYZob{}}\PY{n}{Omega\PYZus{}hat}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{   Matriz de Variância\PYZhy{}Covariância (V\PYZus{}cov\PYZus{}beta\PYZus{}hat):}\PY{l+s+se}{\PYZbs{}n}\PY{l+s+si}{\PYZob{}}\PY{n}{V\PYZus{}cov\PYZus{}beta\PYZus{}hat}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{   Estatística de Wald (Chi\PYZca{}2(}\PY{l+s+si}{\PYZob{}}\PY{n}{q\PYZus{}restrictions}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{)): }\PY{l+s+si}{\PYZob{}}\PY{n}{W\PYZus{}stat}\PY{l+s+si}{:}\PY{l+s+s2}{.4f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{   Estatística F(}\PY{l+s+si}{\PYZob{}}\PY{n}{q\PYZus{}restrictions}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{, }\PY{l+s+si}{\PYZob{}}\PY{n}{N\PYZus{}gmm}\PY{+w}{ }\PY{o}{\PYZhy{}}\PY{+w}{ }\PY{n}{K\PYZus{}params}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{): }\PY{l+s+si}{\PYZob{}}\PY{n}{F\PYZus{}stat}\PY{l+s+si}{:}\PY{l+s+s2}{.4f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{   P\PYZhy{}valor (F): }\PY{l+s+si}{\PYZob{}}\PY{n}{p\PYZus{}value\PYZus{}F}\PY{l+s+si}{:}\PY{l+s+s2}{.4f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+
+Teste de Wald para significância conjunta de beta\_k e beta\_l (H0: beta\_k=0,
+beta\_l=0):
+   Número de observações (GMM): 2047
+   Matriz G\_hat:
+[[-7.68205934 -1.58854136]
+ [-1.89250106 -0.34947153]]
+   Matriz Omega\_hat:
+[[59.6826729  14.58022482]
+ [14.58022482  3.83646026]]
+   Matriz de Variância-Covariância (V\_cov\_beta\_hat):
+[[ 0.0036915  -0.01564909]
+ [-0.01564909  0.0765797 ]]
+   Estatística de Wald (Chi\^{}2(2)): 215.9948
+   Estatística F(2, 2045): 107.9974
+   P-valor (F): 0.0000
+    \end{Verbatim}
+
+    \begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  Calcule o erro-padrão robusto:
+\end{enumerate}
+
+$ SE^{*}_l = \sqrt{\frac{1}{n}(\hat{Avar}(\hat{\delta}(\hat{W})))} $
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{5}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{from} \PY{n+nn}{scipy}\PY{n+nn}{.}\PY{n+nn}{stats} \PY{k+kn}{import} \PY{n}{norm}
+
+
+\PY{c+c1}{\PYZsh{} Os erros padrão robustos são a raiz quadrada da diagonal da matriz de Var\PYZhy{}Cov}
+\PY{n}{se\PYZus{}beta\PYZus{}k} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{sqrt}\PY{p}{(}\PY{n}{V\PYZus{}cov\PYZus{}beta\PYZus{}hat}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{]}\PY{p}{)}
+\PY{n}{se\PYZus{}beta\PYZus{}l} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{sqrt}\PY{p}{(}\PY{n}{V\PYZus{}cov\PYZus{}beta\PYZus{}hat}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{]}\PY{p}{)}
+
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+se}{\PYZbs{}n}\PY{l+s+s2}{Erros Padrão Robustos:}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{   SE(beta\PYZus{}k): }\PY{l+s+si}{\PYZob{}}\PY{n}{se\PYZus{}beta\PYZus{}k}\PY{l+s+si}{:}\PY{l+s+s2}{.4f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{   SE(beta\PYZus{}l): }\PY{l+s+si}{\PYZob{}}\PY{n}{se\PYZus{}beta\PYZus{}l}\PY{l+s+si}{:}\PY{l+s+s2}{.4f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+
+\PY{c+c1}{\PYZsh{} Estatísticas t e p\PYZhy{}valores para significância individual}
+\PY{n}{t\PYZus{}beta\PYZus{}k} \PY{o}{=} \PY{n}{beta\PYZus{}k\PYZus{}gmm} \PY{o}{/} \PY{n}{se\PYZus{}beta\PYZus{}k}
+\PY{n}{t\PYZus{}beta\PYZus{}l} \PY{o}{=} \PY{n}{beta\PYZus{}l\PYZus{}gmm} \PY{o}{/} \PY{n}{se\PYZus{}beta\PYZus{}l}
+
+\PY{c+c1}{\PYZsh{} P\PYZhy{}valores (usando distribuição normal padrão para grandes amostras)}
+\PY{n}{p\PYZus{}value\PYZus{}beta\PYZus{}k} \PY{o}{=} \PY{l+m+mi}{2} \PY{o}{*} \PY{p}{(}\PY{l+m+mi}{1} \PY{o}{\PYZhy{}} \PY{n}{norm}\PY{o}{.}\PY{n}{cdf}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{abs}\PY{p}{(}\PY{n}{t\PYZus{}beta\PYZus{}k}\PY{p}{)}\PY{p}{)}\PY{p}{)}
+\PY{n}{p\PYZus{}value\PYZus{}beta\PYZus{}l} \PY{o}{=} \PY{l+m+mi}{2} \PY{o}{*} \PY{p}{(}\PY{l+m+mi}{1} \PY{o}{\PYZhy{}} \PY{n}{norm}\PY{o}{.}\PY{n}{cdf}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{abs}\PY{p}{(}\PY{n}{t\PYZus{}beta\PYZus{}l}\PY{p}{)}\PY{p}{)}\PY{p}{)}
+
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+se}{\PYZbs{}n}\PY{l+s+s2}{Testes de Significância Individual (usando erros padrão robustos):}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{   beta\PYZus{}k: Coef = }\PY{l+s+si}{\PYZob{}}\PY{n}{beta\PYZus{}k\PYZus{}gmm}\PY{l+s+si}{:}\PY{l+s+s2}{.4f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{, SE = }\PY{l+s+si}{\PYZob{}}\PY{n}{se\PYZus{}beta\PYZus{}k}\PY{l+s+si}{:}\PY{l+s+s2}{.4f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{, t = }\PY{l+s+si}{\PYZob{}}\PY{n}{t\PYZus{}beta\PYZus{}k}\PY{l+s+si}{:}\PY{l+s+s2}{.2f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{, p\PYZhy{}valor = }\PY{l+s+si}{\PYZob{}}\PY{n}{p\PYZus{}value\PYZus{}beta\PYZus{}k}\PY{l+s+si}{:}\PY{l+s+s2}{.4f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{   beta\PYZus{}l: Coef = }\PY{l+s+si}{\PYZob{}}\PY{n}{beta\PYZus{}l\PYZus{}gmm}\PY{l+s+si}{:}\PY{l+s+s2}{.4f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{, SE = }\PY{l+s+si}{\PYZob{}}\PY{n}{se\PYZus{}beta\PYZus{}l}\PY{l+s+si}{:}\PY{l+s+s2}{.4f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{, t = }\PY{l+s+si}{\PYZob{}}\PY{n}{t\PYZus{}beta\PYZus{}l}\PY{l+s+si}{:}\PY{l+s+s2}{.2f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{, p\PYZhy{}valor = }\PY{l+s+si}{\PYZob{}}\PY{n}{p\PYZus{}value\PYZus{}beta\PYZus{}l}\PY{l+s+si}{:}\PY{l+s+s2}{.4f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+
+Erros Padrão Robustos:
+   SE(beta\_k): 0.0608
+   SE(beta\_l): 0.2767
+
+Testes de Significância Individual (usando erros padrão robustos):
+   beta\_k: Coef = 0.3618, SE = 0.0608, t = 5.95, p-valor = 0.0000
+   beta\_l: Coef = -0.1739, SE = 0.2767, t = -0.63, p-valor = 0.5297
+    \end{Verbatim}
+
+    \begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  Calcule as variáveis de transparência de Andrews, Gentzkow e Shapiro
+  (2017, 2020). A medida de sensitividade (AGS 2017):
+\end{enumerate}
+
+\$ \hat{\Lambda} = -(\hat{G}(\hat{\theta})' \hat{W}
+\hat{G}(\hat{\theta}))\^{}\{-1\} \hat{G}(\hat{\theta})' \hat{W} \$
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{11}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{G\PYZus{}hat\PYZus{}inv} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{linalg}\PY{o}{.}\PY{n}{inv}\PY{p}{(}\PY{n}{G\PYZus{}hat}\PY{p}{)}
+\PY{n}{Lambda\PYZus{}hat} \PY{o}{=} \PY{o}{\PYZhy{}}\PY{n}{G\PYZus{}hat\PYZus{}inv}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{   Matriz Lambda\PYZus{}hat:}\PY{l+s+se}{\PYZbs{}n}\PY{l+s+si}{\PYZob{}}\PY{n}{Lambda\PYZus{}hat}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+se}{\PYZbs{}n}\PY{l+s+s2}{Interpretação:}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{  \PYZhy{} Cada linha corresponde a um parâmetro (beta\PYZus{}k, beta\PYZus{}l).}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{  \PYZhy{} Cada coluna corresponde a uma condição de momento (E[u*k]=0, E[u*l\PYZus{}lag]=0).}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{  \PYZhy{} Exemplo: Lambda[0, 0] = }\PY{l+s+si}{\PYZob{}}\PY{n}{Lambda\PYZus{}hat}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,}\PY{+w}{ }\PY{l+m+mi}{0}\PY{p}{]}\PY{l+s+si}{:}\PY{l+s+s2}{.4f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{ indica que um aumento de 1 unidade}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{    no valor do primeiro momento (relativo ao capital) mudaria a estimativa de beta\PYZus{}k}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{    em }\PY{l+s+si}{\PYZob{}}\PY{n}{Lambda\PYZus{}hat}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{,}\PY{+w}{ }\PY{l+m+mi}{0}\PY{p}{]}\PY{l+s+si}{:}\PY{l+s+s2}{.4f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{ unidades.}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+   Matriz Lambda\_hat:
+[[ -1.08647887   4.93864725]
+ [  5.88363349 -23.88290421]]
+
+Interpretação:
+  - Cada linha corresponde a um parâmetro (beta\_k, beta\_l).
+  - Cada coluna corresponde a uma condição de momento (E[u*k]=0, E[u*l\_lag]=0).
+  - Exemplo: Lambda[0, 0] = -1.0865 indica que um aumento de 1 unidade
+    no valor do primeiro momento (relativo ao capital) mudaria a estimativa de
+beta\_k
+    em -1.0865 unidades.
+    \end{Verbatim}
+
+
+    % Add a bibliography block to the postdoc
+    
+    
+    
 \end{document}
